@@ -1,26 +1,29 @@
+<p align="center"><img src="qbtc_logo.png" width="120" alt="Proofnet BTC"></p>
+
 # Proofnet BTC SDK (MIT)
 
-Client helpers and examples for building against a local Proofnet BTC node:
+Client helpers and examples for building against a local Proofnet BTC node.
 
-- Proofnet API: `http://127.0.0.1:25556`
-- ProofWallet API: `http://127.0.0.1:9756`
-- Native Explorer (optional connectors): `http://127.0.0.1:3006`
+All SDK traffic routes through **BTCore** on port `8788`:
 
-This repo intentionally contains **no Proofnet core source**.
+- Proofnet Core: `http://127.0.0.1:8788/pwos/proofnet`
+- ProofWallet: `http://127.0.0.1:8788/pwos/wallet`
+- BTCore (read lane): `http://127.0.0.1:8788`
 
-## Core vs connectors (why 3006 exists)
+## Architecture
 
-- Proofnet BTC *core* is the canonical PQ chain + deterministic lane state. Apps can build only against core APIs.
-- External integrations (EVM vault watchers, Solana adapters, etc.) are *optional connectors* and can be added later.
-- Native Explorer exposes a few convenience “bridge” endpoints (like EVM address registration) that sit on top of ProofWallet.
+- **8788** — BTCore HTTP read lane. The standard SDK/app entry point.
+- **3006** — BTCore PQTLS/TLS lane. Encrypted transport.
 
-## Core API quick map (25556)
+Apps use the BTCore-routed paths on `8788`. The gateway handles routing, access control, and service discovery.
 
-- Node status: `GET /api/status`
-- Core chain snapshot: `GET /core/info`, `GET /core/block/tip`, `GET /core/assets`
-- Memory Blocks SPV: `GET /mblk/spv/proof?digest=...`, `POST /mblk/spv/proofs`
-- Variant Nova (read-only local snapshot): `GET /vnova/prices`, `GET /vnova/price`, `GET /vnova/health`, `GET /vnova/overview`
-- Blockie AI (repo-local grounding): `POST /ai/chat`, `GET /ai/docs/search`, `GET /ai/qbit/context`
+## Core API quick map (via BTCore)
+
+- Node status: `GET /pwos/proofnet/api/status`
+- Core chain snapshot: `GET /pwos/proofnet/core/info`, `GET /pwos/proofnet/core/block/tip`, `GET /pwos/proofnet/core/assets`
+- Memory Blocks SPV: `GET /pwos/proofnet/mblk/spv/proof?digest=...`, `POST /pwos/proofnet/mblk/spv/proofs`
+- Variant Nova (read-only local snapshot): `GET /pwos/proofnet/vnova/prices`, `GET /pwos/proofnet/vnova/price`, `GET /pwos/proofnet/vnova/health`, `GET /pwos/proofnet/vnova/overview`
+- Blockie AI (repo-local grounding): `POST /pwos/proofnet/ai/chat`, `GET /pwos/proofnet/ai/docs/search`, `GET /pwos/proofnet/ai/qbit/context`
 
 ## Python quickstart
 
@@ -33,27 +36,16 @@ python examples/proofnet_status.py
 
 ## JavaScript/TypeScript (Node/Next.js) quickstart
 
-This repo also ships a small, dependency-free JS SDK (published as the
-`@proofnet/sdk` package when installed from this git repo).
-
-Example:
-
 ```bash
 node -e 'import { getApiStatus, resolveCoreBaseUrl } from "@proofnet/sdk"; const base=resolveCoreBaseUrl(); getApiStatus(base).then(r=>console.log(r.status, r.data)).catch(console.error)'
-```
-
-Optional connector helpers:
-
-```bash
-node -e 'import { resolveNativeExplorerBaseUrl, resolveProofwalletBaseUrl, registerProofwalletAddress } from "@proofnet/sdk"; const pw=resolveProofwalletBaseUrl(); registerProofwalletAddress(pw,{wallet:"wallet_id",asset:"seth",address:"0x0000000000000000000000000000000000000000"}).then(r=>console.log(r.status,r.data)).catch(console.error)'
 ```
 
 ## Curl (no SDK)
 
 ```bash
-curl -s http://127.0.0.1:25556/api/status | jq
-curl -s http://127.0.0.1:25556/core/info | jq
-curl -s 'http://127.0.0.1:25556/ai/docs/search?q=proofnet%20core%20facts' | jq
-curl -s http://127.0.0.1:9756/readyz | jq
-curl -s http://127.0.0.1:3006/healthz | jq
+curl -s http://127.0.0.1:8788/pwos/proofnet/api/status | jq
+curl -s http://127.0.0.1:8788/pwos/proofnet/core/info | jq
+curl -s 'http://127.0.0.1:8788/pwos/proofnet/ai/docs/search?q=proofnet%20core%20facts' | jq
+curl -s http://127.0.0.1:8788/pwos/wallet/readyz | jq
+curl -s http://127.0.0.1:8788/healthz | jq
 ```

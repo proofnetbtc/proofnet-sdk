@@ -23,13 +23,16 @@ Logs are written to timestamped files under:
 
 Press `Ctrl+C` to stop the monitor.
 
-## What It Records
+## Log Fields
 
-- Overall CPU usage
-- Memory usage
-- `C:` disk fullness
-- Available Windows temperature sensor reading and source
-- Top CPU-consuming processes during the sample window
+- `Timestamp`: local time when the log entry was started.
+- `CPU Usage`: overall CPU utilization percentage sampled from Windows counters.
+- `Memory`: physical memory utilization percentage plus used and total memory.
+- `Disk`: percentage of the `C:` drive currently in use.
+- `Temperature`: available Windows sensor reading and the sensor source, when
+  Windows exposes one.
+- `Top CPU-consuming processes`: process names ranked by CPU time consumed
+  during the sample window, with working-set memory shown for each process.
 
 ## Safety Notes
 

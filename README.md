@@ -4,6 +4,9 @@
 
 Client helpers and examples for building against a local Proofnet BTC node.
 
+This repo contains SDK clients, examples, and diagnostics only. It does not
+contain Proofnet core source.
+
 All SDK traffic routes through **BTCore** on port `8788`:
 
 - Proofnet Core: `http://127.0.0.1:8788/pwos/proofnet`
@@ -39,6 +42,17 @@ python examples/proofnet_status.py
 ```bash
 node -e 'import { getApiStatus, resolveCoreBaseUrl } from "@proofnet/sdk"; const base=resolveCoreBaseUrl(); getApiStatus(base).then(r=>console.log(r.status, r.data)).catch(console.error)'
 ```
+
+## Windows heat monitor
+
+The SDK includes a Windows 11 diagnostic helper in
+[`monitor_heat/`](monitor_heat/). It writes timestamped log files under
+`%USERPROFILE%\\proofnet-monitor-logs\\` and records CPU load, memory pressure,
+`C:` disk fullness, available Windows temperature sensor readings, and top
+CPU-consuming processes.
+
+See [`monitor_heat/README.md`](monitor_heat/README.md) for the log field
+descriptions and run command.
 
 ## Curl (no SDK)
 
